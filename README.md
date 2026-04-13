@@ -1,0 +1,2 @@
+# G7Cripto_Brief_Diseno_Kevin_Barragan_Abril_12_2026
+G7Cripto_Brief_Diseno_Kevin_Barragan_Abril_12_2026
