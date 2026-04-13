@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G7Cripto — Brief de Diseño para Kevin Barragán</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f3efe8;
+  --paper: #ffffff;
+  --ink: #181818;
+  --muted: #6f6f6f;
+  --line: #ded7cc;
+  --green: #0F6E56;
+  --green-soft: #edf8f3;
+  --blue: #185FA5;
+  --blue-soft: #eef5fd;
+  --red: #7b1f22;
+  --red-soft: #fdf1f1;
+  --amber: #8a5b10;
+  --amber-soft: #fff7ea;
+  --purple: #4f46b6;
+  --purple-soft: #f4f3ff;
+  --tiktok: #010101;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.55; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 64px; }
+
+/* HERO */
+.hero { background: linear-gradient(135deg, #111, #191919 55%, #0F6E56 140%); color: #fff; border-radius: 22px; padding: 34px; margin-bottom: 20px; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #bcbcbc; margin-bottom: 10px; }
+.hero h1 { font-size: 34px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.1; }
+.hero-sub { font-size: 15px; color: #d0d0d0; max-width: 700px; margin-bottom: 18px; line-height: 1.6; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14); font-size: 12px; font-family: 'DM Mono', monospace; }
+
+/* SECTIONS */
+.section { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 24px; margin-bottom: 16px; }
+.section-title { font-size: 20px; font-weight: 500; margin-bottom: 16px; }
+.section-intro { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+
+/* GRIDS */
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.g3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.g4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+
+/* CARDS */
+.card { background: #faf8f3; border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.card.white { background: #fff; }
+.card h4 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.card p, .card li { font-size: 13px; color: #444; line-height: 1.6; }
+ul { margin: 6px 0 0 16px; }
+li { margin-bottom: 4px; }
+
+/* TAGS */
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: 'DM Mono', monospace; padding: 4px 10px; border-radius: 999px; font-weight: 500; letter-spacing: .03em; }
+.tag-google { background: #EBF4FF; color: #185FA5; }
+.tag-meta { background: #EEF2FF; color: #1877F2; }
+.tag-tiktok { background: #1a1a18; color: #fff; }
+.tag-video { background: var(--purple-soft); color: var(--purple); }
+.tag-image { background: var(--green-soft); color: var(--green); }
+.tag-carousel { background: var(--amber-soft); color: var(--amber); }
+.tag-spark { background: #fdf1f1; color: #7b1f22; }
+.tag-co { background: #FCEBEB; color: #791F1F; }
+.tag-mx { background: #FEF9EC; color: #633806; }
+.tag-ar { background: #E6F1FB; color: #0C447C; }
+.tag-cl { background: #E1F5EE; color: #085041; }
+.tag-ec { background: #F1EFE8; color: #444441; }
+.tag-pa { background: #EDE8FC; color: #4A1F99; }
+.tag-uy { background: #FEF3EE; color: #7A2E0E; }
+
+/* NOTES */
+.note { padding: 12px 14px; border-radius: 0 12px 12px 0; margin: 12px 0; font-size: 13px; line-height: 1.6; }
+.note-green { background: var(--green-soft); border-left: 4px solid var(--green); color: #085041; }
+.note-blue { background: var(--blue-soft); border-left: 4px solid var(--blue); color: #0C447C; }
+.note-amber { background: var(--amber-soft); border-left: 4px solid var(--amber); color: #633806; }
+.note-red { background: var(--red-soft); border-left: 4px solid var(--red); color: var(--red); }
+
+/* SUMMARY TABLE */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #888; padding: 10px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+.table td { padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table tr:last-child td { border-bottom: none; }
+.table .num { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; }
+.table .total td { background: #f9f8f5; font-weight: 600; }
+
+/* PIECE CARDS */
+.piece { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 14px; }
+.piece-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 14px 16px; background: #faf8f3; border-bottom: 1px solid var(--line); }
+.piece-head strong { font-size: 14px; }
+.piece-body { padding: 16px; }
+.piece-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.field { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.lbl { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #999; margin-bottom: 5px; }
+.txt { font-size: 13px; color: #222; line-height: 1.55; }
+.spec-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.spec { font-family: 'DM Mono', monospace; font-size: 11px; background: #f3efe8; border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; color: #555; }
+
+/* COUNTRY BLOCK */
+.country-block { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
+.country-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; padding: 20px 22px; background: #fcfbf8; border-bottom: 1px solid var(--line); }
+.country-title { font-size: 22px; font-weight: 500; margin: 8px 0 4px; }
+.country-desc { font-size: 13px; color: var(--muted); }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stat { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; min-width: 100px; }
+.stat .k { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #888; }
+.stat .v { font-size: 17px; font-weight: 600; margin-top: 3px; }
+.country-body { padding: 22px; }
+
+/* TOTALS */
+.totals-bar { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
+.total-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 18px; text-align: center; }
+.total-card .tk { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #888; margin-bottom: 6px; }
+.total-card .tv { font-size: 28px; font-weight: 600; }
+.total-card .tsub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* FORMATS REFERENCE */
+.fmt-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.fmt-card { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.fmt-header { padding: 12px 14px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.fmt-body { padding: 12px 14px; border-top: 1px solid var(--line); }
+.fmt-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid #f0ede8; }
+.fmt-row:last-child { border-bottom: none; }
+.fmt-row .fl { color: #888; }
+.fmt-row .fv { font-family: 'DM Mono', monospace; font-size: 11px; color: #222; font-weight: 500; }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--line); margin: 20px 0; }
+
+/* FOOTER */
+.footer { text-align: center; padding: 20px 0 0; font-family: 'DM Mono', monospace; font-size: 11px; color: #bbb; letter-spacing: .05em; }
+
+@media (max-width: 700px) {
+  .g2, .g3, .g4, .piece-grid, .fmt-grid, .totals-bar { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 26px; }
+  .country-head { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">G7Cripto · Brief de Diseño · Para Kevin Barragán · Abril 2026</div>
+    <h1>Diseños necesarios para<br>campañas pagas LATAM</h1>
+    <div class="hero-sub">Este documento detalla todas las piezas gráficas requeridas para las campañas de Google Ads, Meta y TikTok en los 7 países donde opera G7Cripto. Está organizado por país, por plataforma y por tipo de pieza para facilitar la cotización.</div>
+    <div class="pills">
+      <span class="pill">7 países · CO · MX · AR · CL · EC · PA · UY</span>
+      <span class="pill">3 plataformas · Google · Meta · TikTok</span>
+      <span class="pill">Objetivo: descargas de app</span>
+      <span class="pill">Brief base: Abril 12, 2026</span>
+    </div>
+  </div>
+
+  <!-- RESUMEN EJECUTIVO -->
+  <div class="section">
+    <div class="section-title">Resumen de piezas totales</div>
+    <div class="totals-bar">
+      <div class="total-card">
+        <div class="tk">Total piezas</div>
+        <div class="tv" style="color:var(--ink)">36</div>
+        <div class="tsub">entre los 7 países</div>
+      </div>
+      <div class="total-card">
+        <div class="tk">Google Ads</div>
+        <div class="tv" style="color:var(--blue)">14</div>
+        <div class="tsub">sets de assets</div>
+      </div>
+      <div class="total-card">
+        <div class="tk">Meta</div>
+        <div class="tv" style="color:#1877F2">13</div>
+        <div class="tsub">piezas estáticas + carrusel</div>
+      </div>
+      <div class="total-card">
+        <div class="tk">TikTok</div>
+        <div class="tv" style="color:var(--purple)">9</div>
+        <div class="tsub">storyboards / motion</div>
+      </div>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>País</th>
+          <th>Google Ads</th>
+          <th>Meta</th>
+          <th>TikTok</th>
+          <th>Total piezas</th>
+          <th>Presupuesto pauta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-co">🇨🇴 Colombia</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">2 piezas</td>
+          <td class="num">2 videos</td>
+          <td class="num">6</td>
+          <td>USD 300</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-mx">🇲🇽 México</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">1 pieza</td>
+          <td class="num">1 video</td>
+          <td class="num">4 — 5</td>
+          <td>USD 220</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-ar">🇦🇷 Argentina</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">2 piezas</td>
+          <td class="num">2 videos</td>
+          <td class="num">6</td>
+          <td>USD 180</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-cl">🇨🇱 Chile</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">1 pieza</td>
+          <td class="num">1 video</td>
+          <td class="num">4</td>
+          <td>USD 120</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-ec">🇪🇨 Ecuador</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">1 pieza</td>
+          <td class="num">1 video</td>
+          <td class="num">4</td>
+          <td>USD 70</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-pa">🇵🇦 Panamá</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">1 pieza</td>
+          <td class="num">1 video</td>
+          <td class="num">4</td>
+          <td>USD 70</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-uy">🇺🇾 Uruguay</span></td>
+          <td class="num">2 sets</td>
+          <td class="num">1 pieza</td>
+          <td class="num">—</td>
+          <td class="num">3</td>
+          <td>USD 40</td>
+        </tr>
+        <tr class="total">
+          <td><strong>TOTAL</strong></td>
+          <td class="num">14 sets</td>
+          <td class="num">9 piezas + 1 carrusel (4 slides)</td>
+          <td class="num">8 videos + 1 Spark</td>
+          <td class="num"><strong>36</strong></td>
+          <td><strong>USD 1.000</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ESPECIFICACIONES TÉCNICAS -->
+  <div class="section">
+    <div class="section-title">Especificaciones técnicas por plataforma</div>
+    <div class="fmt-grid">
+      <div class="fmt-card">
+        <div class="fmt-header" style="background:#EBF4FF;">
+          <span class="tag tag-google">G</span> Google Ads
+        </div>
+        <div class="fmt-body">
+          <div class="fmt-row"><span class="fl">Imagen cuadrada</span><span class="fv">1200×1200 px</span></div>
+          <div class="fmt-row"><span class="fl">Imagen horizontal</span><span class="fv">1200×628 px</span></div>
+          <div class="fmt-row"><span class="fl">Imagen vertical</span><span class="fv">960×1200 px</span></div>
+          <div class="fmt-row"><span class="fl">Logo</span><span class="fv">1200×1200 px</span></div>
+          <div class="fmt-row"><span class="fl">Video horizontal</span><span class="fv">16:9 · mín. 10 seg</span></div>
+          <div class="fmt-row"><span class="fl">Video vertical</span><span class="fv">9:16 · mín. 10 seg</span></div>
+          <div class="fmt-row"><span class="fl">Formato</span><span class="fv">JPG/PNG · MP4/MOV</span></div>
+          <div class="fmt-row"><span class="fl">Peso máx.</span><span class="fv">5 MB imagen · 256 MB video</span></div>
+          <div class="fmt-row"><span class="fl">Texto en imagen</span><span class="fv">máx. 20% del área</span></div>
+        </div>
+      </div>
+      <div class="fmt-card">
+        <div class="fmt-header" style="background:#EEF2FF;">
+          <span class="tag tag-meta">f</span> Meta (FB + IG)
+        </div>
+        <div class="fmt-body">
+          <div class="fmt-row"><span class="fl">Feed cuadrado</span><span class="fv">1080×1080 px</span></div>
+          <div class="fmt-row"><span class="fl">Feed horizontal</span><span class="fv">1200×628 px</span></div>
+          <div class="fmt-row"><span class="fl">Stories / Reels</span><span class="fv">1080×1920 px (9:16)</span></div>
+          <div class="fmt-row"><span class="fl">Carrusel slide</span><span class="fv">1080×1080 px</span></div>
+          <div class="fmt-row"><span class="fl">Video Reels</span><span class="fv">9:16 · 15–60 seg</span></div>
+          <div class="fmt-row"><span class="fl">Formato imagen</span><span class="fv">JPG/PNG · máx. 30 MB</span></div>
+          <div class="fmt-row"><span class="fl">Formato video</span><span class="fv">MP4/MOV · máx. 4 GB</span></div>
+          <div class="fmt-row"><span class="fl">Texto en imagen</span><span class="fv">mínimo (sin restricción % pero afecta distribución)</span></div>
+          <div class="fmt-row"><span class="fl">Safe zone Stories</span><span class="fv">250 px arriba y abajo</span></div>
+        </div>
+      </div>
+      <div class="fmt-card">
+        <div class="fmt-header" style="background:#1a1a18;">
+          <span class="tag tag-tiktok">TT</span> <span style="color:#fff; font-size:13px;">TikTok</span>
+        </div>
+        <div class="fmt-body">
+          <div class="fmt-row"><span class="fl">Formato</span><span class="fv">9:16 vertical · obligatorio</span></div>
+          <div class="fmt-row"><span class="fl">Resolución</span><span class="fv">1080×1920 px</span></div>
+          <div class="fmt-row"><span class="fl">Duración</span><span class="fv">15–60 seg (ideal 15–30)</span></div>
+          <div class="fmt-row"><span class="fl">Formato video</span><span class="fv">MP4/MOV</span></div>
+          <div class="fmt-row"><span class="fl">Peso máx.</span><span class="fv">500 MB</span></div>
+          <div class="fmt-row"><span class="fl">Safe zone inferior</span><span class="fv">250 px (iconos TikTok)</span></div>
+          <div class="fmt-row"><span class="fl">Safe zone lateral</span><span class="fv">100 px cada lado</span></div>
+          <div class="fmt-row"><span class="fl">Subtítulos</span><span class="fv">Obligatorios en pantalla</span></div>
+          <div class="fmt-row"><span class="fl">Estilo</span><span class="fv">Orgánico · no corporativo</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note note-blue" style="margin-top:14px"><strong>Nota para Kevin:</strong> Cada "set de assets Google" incluye las 3 versiones de imagen (1200×1200, 1200×628, 960×1200) + el logo adaptado. Los copies de texto (headlines y descriptions) los provee el equipo de marketing — el diseñador solo necesita crear los visuales.</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- COLOMBIA -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-co">🇨🇴 Colombia</span>
+        <div class="country-title">Colombia — 6 piezas</div>
+        <div class="country-desc">Mercado principal · Canal líder: TikTok · Hook: Ahorro · Presupuesto: USD 300</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">2 piezas</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">2 videos</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+
+      <!-- GOOGLE CO -->
+      <div class="piece">
+        <div class="piece-head">
+          <strong>Pieza 1 · Google Ads — Set de assets (ángulo: Ahorro)</strong>
+          <span class="tag tag-google">Google Ads</span>
+        </div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field">
+              <div class="lbl">Concepto visual</div>
+              <div class="txt">Imagen limpia que transmita ahorro y control. Fondo oscuro o verde G7Cripto. App en pantalla o wallet. Sin texto excesivo.</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Mensaje clave en imagen</div>
+              <div class="txt">"Cobra mejor tus pagos" · "Un saldo para todo" · "Retiro same-day"</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="spec">1200×1200 px (cuadrada)</span>
+            <span class="spec">1200×628 px (horizontal)</span>
+            <span class="spec">960×1200 px (vertical)</span>
+            <span class="spec">Logo G7Cripto 1200×1200</span>
+            <span class="spec">JPG/PNG · max 5 MB c/u</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head">
+          <strong>Pieza 2 · Google Ads — Set de assets (ángulo: Velocidad same-day)</strong>
+          <span class="tag tag-google">Google Ads</span>
+        </div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field">
+              <div class="lbl">Concepto visual</div>
+              <div class="txt">Énfasis en rapidez. Puede incluir ícono de reloj, flecha o gráfico de transferencia instantánea. Estilo moderno y limpio.</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Mensaje clave en imagen</div>
+              <div class="txt">"Retiro same-day" · "Lo pedís hoy, lo recibís hoy" · "Sin esperas"</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="spec">1200×1200 px</span>
+            <span class="spec">1200×628 px</span>
+            <span class="spec">960×1200 px</span>
+            <span class="spec">JPG/PNG · max 5 MB c/u</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- META CO -->
+      <div class="piece">
+        <div class="piece-head">
+          <strong>Pieza 3 · Meta — Carrusel (4 slides) — "De muchos lugares a uno solo"</strong>
+          <span class="tag tag-carousel">Meta Carrusel</span>
+        </div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field">
+              <div class="lbl">Slide 1</div>
+              <div class="txt">Texto: "¿Pagos en distintos lugares?" · Visual: caos / múltiples logos de plataformas dispersos</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Slide 2</div>
+              <div class="txt">Texto: "G7Cripto consolida todo en un saldo en USD" · Visual: embudo o consolidación visual</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Slide 3</div>
+              <div class="txt">Texto: "Retirás cuando querés" · Visual: pantalla de retiro o reloj</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Slide 4 — CTA</div>
+              <div class="txt">Texto: "Same-day · sin montos mínimos · Descargar G7Cripto" · Visual: app store badges</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="spec">4 slides · 1080×1080 px c/u</span>
+            <span class="spec">JPG/PNG · max 30 MB c/u</span>
+            <span class="spec">Estilo consistente entre slides</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head">
+          <strong>Pieza 4 · Meta — Imagen estática Feed/Stories — "Perdés menos al cobrar"</strong>
+          <span class="tag tag-image">Meta Imagen</span>
+        </div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field">
+              <div class="lbl">Concepto</div>
+              <div class="txt">Imagen impactante de contraste: antes (perder dinero en comisiones) vs. después (recibir más). Minimalista, fondo oscuro con acento verde G7.</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Texto en imagen</div>
+              <div class="txt">Headline: "Perdés menos al cobrar" · Sub: "Un saldo en USD · Retiro same-day · Wallet verificada"</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="spec">Feed: 1080×1080 px</span>
+            <span class="spec">Stories: 1080×1920 px</span>
+            <span class="spec">JPG/PNG</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIKTOK CO -->
+      <div class="piece">
+        <div class="piece-head">
+          <strong>Pieza 5 · TikTok — Video "Problema económico" (15–30 seg)</strong>
+          <span class="tag tag-video">TikTok Video</span>
+        </div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field">
+              <div class="lbl">Hook visual (primeros 3 seg)</div>
+              <div class="txt">Texto en pantalla animado: "¿Tus pagos llegan… pero cada retiro te quita demasiado?" · Fondo impactante, animación rápida.</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Cuerpo del video</div>
+              <div class="txt">Animación o persona en cámara. Secuencia: comisiones + cambio castigado + espera = menos dinero → solución G7Cripto → retiro same-day.</div>
+            </div>
+            <div class="field">
+              <div class="lbl">CTA final</div>
+              <div class="txt">"Descarga G7Cripto" + flecha hacia arriba apuntando al link en bio.</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Estilo</div>
+              <div class="txt">Orgánico, no corporativo. Subtítulos en pantalla obligatorios. Puede ser motion graphics o persona real a cámara.</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="spec">1080×1920 px (9:16)</span>
+            <span class="spec">15–30 seg</span>
+            <span class="spec">MP4/MOV</span>
+            <span class="spec">Subtítulos en pantalla</span>
+            <span class="spec">Safe zone inferior 250 px</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head">
+          <strong>Pieza 6 · TikTok — Spark Ad "Testimonio" (30–60 seg)</strong>
+          <span class="tag tag-spark">Spark Ad</span>
+        </div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field">
+              <div class="lbl">Hook</div>
+              <div class="txt">"Yo no necesitaba otra wallet. Necesitaba perder menos cuando cobraba."</div>
+            </div>
+            <div class="field">
+              <div class="lbl">Formato</div>
+              <div class="txt">Tono testimonial orgánico. Diseño de soporte: overlay de texto, lower thirds con datos clave, CTA al final.</div>
+            </div>
+          </div>
+          <div class="note note-amber" style="margin-top: 10px;">El video lo graba el creador/modelo. Kevin diseña el <strong>overlay gráfico</strong>: lower thirds, textos animados en pantalla, CTA final y branding G7Cripto adaptado al estilo TikTok.</div>
+          <div class="spec-row">
+            <span class="spec">1080×1920 px (9:16)</span>
+            <span class="spec">30–60 seg</span>
+            <span class="spec">Overlay + lower thirds</span>
+            <span class="spec">Template reutilizable</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- MÉXICO -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-mx">🇲🇽 México</span>
+        <div class="country-title">México — 4–5 piezas</div>
+        <div class="country-desc">Segundo mercado · Canal líder: TikTok · Hook: Control + Ahorro · Presupuesto: USD 220</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">1 pieza</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">1 video</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+      <div class="note note-blue" style="margin-bottom:14px">Los assets de Google para MX pueden reutilizar las versiones de CO con ajuste de copy. Kevin confirmar si cotiza adaptación o pieza nueva.</div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 1 · Google Ads — Set assets (ángulo: Control + orden)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Un solo saldo en USD. Imagen de app con saldo visible. Estilo limpio y moderno.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Tus pagos en un saldo" · "Retira hoy mismo" · "Cobra mejor en MX"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span><span class="spec">Logo 1200×1200</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 2 · Google Ads — Set assets (ángulo: Velocidad)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Énfasis en same-day y sin fricción. Fondo oscuro, acento verde. Ícono de transferencia o cronómetro.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Menos fricción, mejor experiencia" · "Mismo día"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 3 · Meta — Imagen estática — "Menos costo. Más control."</strong><span class="tag tag-image">Meta Imagen</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Visual directo: fondo oscuro, headline prominente, app UI o wallet. Adaptado a MXN en copy.</div></div>
+            <div class="field"><div class="lbl">Texto en imagen</div><div class="txt">Headline: "Menos costo. Más control." · Sub: "Saldo en USD · Retiro same-day · Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Feed: 1080×1080 px</span><span class="spec">Stories: 1080×1920 px</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 4 · TikTok — Video "Control y orden" (15–25 seg)</strong><span class="tag tag-video">TikTok Video</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Hook visual</div><div class="txt">"Si tus plataformas pagan distinto, no deberías perder más por cobrar." · Texto animado en pantalla.</div></div>
+            <div class="field"><div class="lbl">Remate visual</div><div class="txt">"Con G7Cripto todo llega a un solo saldo y retiras cuando quieras." · App en pantalla · CTA descarga.</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1080×1920 px (9:16)</span><span class="spec">15–25 seg</span><span class="spec">MP4/MOV</span><span class="spec">Subtítulos obligatorios</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- ARGENTINA -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-ar">🇦🇷 Argentina</span>
+        <div class="country-title">Argentina — 6 piezas</div>
+        <div class="country-desc">Mercado especial · Canal líder: TikTok · Hook: USD real + cripto · Presupuesto: USD 180</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">2 piezas</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">2 videos</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+      <div class="note note-red" style="margin-bottom:14px"><strong>ARG es un mercado especial:</strong> el ángulo principal es preservación de valor. El copy y el visual deben evocar USD real, USDT, USDC y BTC como alternativa al ARS. El dolor no es solo la comisión — es perder valor.</div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 1 · Google Ads — Set assets (ángulo: USD / cripto)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Imagen de billetera cripto o símbolo USD/USDT. Fondo oscuro premium. Transmite protección de valor.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Cobrá en USD real" · "Elegí USDT o BTC" · "Retiro same-day"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span><span class="spec">Logo</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 2 · Google Ads — Set assets (ángulo: Control de salida)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Opciones de salida: cripto directo o banco. Puede ser un split visual: "vos elegís". Paleta oscura/verde.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Un saldo para todo" · "Elegí cómo salir" · "Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 3 · Meta — Imagen estática — "Cobrá mejor. Elegís vos."</strong><span class="tag tag-image">Meta Imagen</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Imagen premium. Fondo oscuro, degradado negro/verde. Prominencia en "USD real" o íconos cripto.</div></div>
+            <div class="field"><div class="lbl">Texto en imagen</div><div class="txt">"Cobrá mejor. Elegís vos." · Sub: "Saldo en USD · Retiro en cripto o banco · Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Feed: 1080×1080 px</span><span class="spec">Stories: 1080×1920 px</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 4 · Meta — Imagen Stories — "USD, USDT, USDC o BTC"</strong><span class="tag tag-image">Meta Stories</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Visual en 9:16. Muestra las 4 opciones de salida (USD, USDT, USDC, BTC) de forma clara y atractiva.</div></div>
+            <div class="field"><div class="lbl">Texto en imagen</div><div class="txt">"Elegís cómo recibir tu plata" · Íconos de cada cripto · CTA descarga</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Stories: 1080×1920 px</span><span class="spec">Safe zone 250 px top/bottom</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 5 · TikTok — Video "Cobrar no debería hacerte perder valor" (15–30 seg)</strong><span class="tag tag-video">TikTok Video</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Hook visual</div><div class="txt">Texto en pantalla: "Cobrar no debería hacerte perder valor." · Arranque impactante.</div></div>
+            <div class="field"><div class="lbl">Secuencia</div><div class="txt">Íconos de USD → USDT → USDC → BTC apareciendo en pantalla → App G7 → retiro same-day → CTA.</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1080×1920 px (9:16)</span><span class="spec">15–30 seg</span><span class="spec">MP4/MOV</span><span class="spec">Subtítulos</span></div>
+        </div>
+      </div>
+
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 6 · TikTok — Video "Opción de salida" (15 seg)</strong><span class="tag tag-video">TikTok Video</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Video muy corto y directo. Motion graphics mostrando las 4 opciones de retiro. Estilo enérgico.</div></div>
+            <div class="field"><div class="lbl">CTA</div><div class="txt">"Descargá G7Cripto" con flecha + "Link arriba"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1080×1920 px (9:16)</span><span class="spec">15 seg</span><span class="spec">Motion graphics</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- CHILE -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-cl">🇨🇱 Chile</span>
+        <div class="country-title">Chile — 4 piezas</div>
+        <div class="country-desc">Eficiencia y control · Canal líder: Google · Hook: Claridad y rapidez · Presupuesto: USD 120</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">1 pieza</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">1 video</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 1 · Google Ads — Set assets (ángulo: Retiro en CLP same-day)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Imagen profesional y limpia. App UI mostrando saldo. Énfasis en "CLP" y "mismo día".</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Retiro en CLP hoy" · "Un saldo para todo" · "Más control al cobrar"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 2 · Google Ads — Set assets (ángulo: Simplicidad)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Un proceso simple. Visual minimalista. Fondo claro o blanco. Estilo fintech premium.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Más simple, más rápido" · "Sin montos mínimos" · "Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 3 · Meta — Reels/Feed — "Todos tus pagos, en un solo lugar"</strong><span class="tag tag-image">Meta Imagen</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Visual ordenado y profesional. Consolidación de pagos → un saldo. Estilo CL: limpio, no agresivo.</div></div>
+            <div class="field"><div class="lbl">Texto</div><div class="txt">"Todos tus pagos, en un solo lugar" · "Retira en CLP, el mismo día"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Feed: 1080×1080 px</span><span class="spec">Stories: 1080×1920 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 4 · TikTok — Video "Eficiencia" (15–20 seg)</strong><span class="tag tag-video">TikTok Video</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Hook visual</div><div class="txt">"¿Recibís ingresos de plataformas digitales? Esto te ahorra tiempo y comisiones."</div></div>
+            <div class="field"><div class="lbl">Secuencia</div><div class="txt">Consolidación → retiro → CLP en banco. Subtítulos. CTA final descarga.</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1080×1920 px (9:16)</span><span class="spec">15–20 seg</span><span class="spec">Subtítulos</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- ECUADOR -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-ec">🇪🇨 Ecuador</span>
+        <div class="country-title">Ecuador — 4 piezas</div>
+        <div class="country-desc">País dolarizado · Canal líder: Google · Hook: USD directo sin castigo · Presupuesto: USD 70</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">1 pieza</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">1 video</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+      <div class="note note-amber" style="margin-bottom:14px"><strong>Regla EC:</strong> eliminar toda referencia a moneda local o conversión. El copy y el visual deben hablar exclusivamente en USD. No hay tipo de cambio.</div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 1 · Google Ads — Set assets (ángulo: USD sin castigo)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Imagen clara con símbolo USD prominente. "Cobrar en USD" sin conversión ni pérdida. Estilo profesional.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Cobra en USD mejor" · "Menos costo total" · "Retiro hoy mismo"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 2 · Google Ads — Set assets (ángulo: Control USD)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">App con saldo en USD. "Un saldo en USD". Sin conversión visual. Limpio y directo.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Un saldo en USD" · "Sin montos mínimos" · "Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 3 · Meta — Imagen estática — "Tus pagos en USD, sin castigo extra"</strong><span class="tag tag-image">Meta Imagen</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Minimalista. Fondo oscuro o neutro. USD central. Sub: wallet verificada + same-day.</div></div>
+            <div class="field"><div class="lbl">Texto</div><div class="txt">"Tus pagos en USD, sin castigo extra" · "Un solo saldo · Retiro same-day · Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Feed: 1080×1080 px</span><span class="spec">Stories: 1080×1920 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 4 · TikTok — Video "USD directo" (15 seg)</strong><span class="tag tag-video">TikTok Video</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Hook visual</div><div class="txt">"Si trabajás con plataformas digitales y querés recibir en USD sin perder nada — escuchá esto."</div></div>
+            <div class="field"><div class="lbl">Secuencia</div><div class="txt">Plataformas → saldo USD → retiro USD banco → CTA descarga. Solo USD en pantalla.</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1080×1920 px (9:16)</span><span class="spec">15 seg</span><span class="spec">Subtítulos</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- PANAMÁ -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-pa">🇵🇦 Panamá</span>
+        <div class="country-title">Panamá — 4 piezas</div>
+        <div class="country-desc">País dolarizado · Canal líder: Google · Hook: Menor costo + rapidez · Presupuesto: USD 70</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">1 pieza</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">1 video</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 1 · Google Ads — Set assets (ángulo: Menos costo)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Foco en ahorro. Visual financiero profesional. PA tiene perfil de hub financiero — estilo más ejecutivo.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Menos costo al cobrar" · "Un saldo en USD" · "Retiro same-day"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 2 · Google Ads — Set assets (ángulo: Velocidad USD)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Transferencia rápida en USD. Cronómetro o ícono de velocidad. Profesional y directo.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Retiro same-day" · "Sin montos mínimos" · "Wallet verificada"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 3 · Meta — Imagen — "Tus pagos no deberían costarte tanto"</strong><span class="tag tag-image">Meta Imagen</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">Estilo profesional PA. Fondo oscuro/verde. Frase de impacto. USD en primer plano.</div></div>
+            <div class="field"><div class="lbl">Texto</div><div class="txt">"Tus pagos no deberían costarte tanto" · "G7Cripto: un saldo USD, retiro same-day"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Feed: 1080×1080 px</span><span class="spec">Stories: 1080×1920 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 4 · TikTok — Video corto "Ahorro USD" (15 seg)</strong><span class="tag tag-video">TikTok Video</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Hook visual</div><div class="txt">"Tus pagos no deberían costarte tanto." → G7Cripto: saldo USD, retiro same-day.</div></div>
+            <div class="field"><div class="lbl">Estilo</div><div class="txt">Motion graphics o persona a cámara. Solo USD en pantalla. CTA descarga.</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1080×1920 px (9:16)</span><span class="spec">15 seg</span><span class="spec">Subtítulos</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════ -->
+  <!-- URUGUAY -->
+  <!-- ═══════════════════════════════ -->
+  <div class="country-block">
+    <div class="country-head">
+      <div>
+        <span class="tag tag-uy">🇺🇾 Uruguay</span>
+        <div class="country-title">Uruguay — 3 piezas</div>
+        <div class="country-desc">Mercado pequeño · Canal líder: Google · Hook: Premium + confianza · Presupuesto: USD 40 · Sin TikTok</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Google</div><div class="v">2 sets</div></div>
+        <div class="stat"><div class="k">Meta</div><div class="v">1 pieza</div></div>
+        <div class="stat"><div class="k">TikTok</div><div class="v">No aplica</div></div>
+      </div>
+    </div>
+    <div class="country-body">
+      <div class="note note-green" style="margin-bottom:14px">Uruguay no tiene presupuesto de TikTok. Solo Google y Meta. Estilo aspiracional y profesional — no agresivo.</div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 1 · Google Ads — Set assets (ángulo: Control premium)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Estilo premium. Fondo blanco/gris claro o negro elegante. App UI limpia. Transmite confianza y orden.</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Más control al cobrar" · "Un saldo en USD" · "Retira cuando quieras"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 2 · Google Ads — Set assets (ángulo: Experiencia premium)</strong><span class="tag tag-google">Google Ads</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto visual</div><div class="txt">Fintech premium. Interfaz app o gráfico clean. No agresivo. "Experiencia de cobro ordenada y moderna".</div></div>
+            <div class="field"><div class="lbl">Mensaje clave</div><div class="txt">"Experiencia premium" · "Wallet verificada" · "Retira cuando quieras"</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">1200×1200 px</span><span class="spec">1200×628 px</span><span class="spec">960×1200 px</span></div>
+        </div>
+      </div>
+      <div class="piece">
+        <div class="piece-head"><strong>Pieza 3 · Meta — Imagen estática premium — "Cobra con más control"</strong><span class="tag tag-image">Meta Imagen</span></div>
+        <div class="piece-body">
+          <div class="piece-grid">
+            <div class="field"><div class="lbl">Concepto</div><div class="txt">La pieza más elegante del set. Fondo oscuro con detalles finos. Estilo aspiracional. Transmite confianza, no urgencia.</div></div>
+            <div class="field"><div class="lbl">Texto</div><div class="txt">"Cobra con más control." · "Un saldo en USD, wallet verificada y retiro cuando quieras."</div></div>
+          </div>
+          <div class="spec-row"><span class="spec">Feed: 1080×1080 px</span><span class="spec">Stories: 1080×1920 px</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- DIRECTRICES DE MARCA -->
+  <div class="section">
+    <div class="section-title">Directrices de marca para todas las piezas</div>
+    <div class="g3">
+      <div class="card white">
+        <h4>Paleta de colores principal</h4>
+        <ul>
+          <li>Verde G7Cripto: <strong>#0F6E56</strong></li>
+          <li>Negro: <strong>#101010 / #1a1a18</strong></li>
+          <li>Blanco: <strong>#FFFFFF</strong></li>
+          <li>Verde suave: <strong>#E1F5EE</strong> (fondos)</li>
+          <li>Acento teal claro: <strong>#5DCAA5</strong></li>
+        </ul>
+      </div>
+      <div class="card white">
+        <h4>Tipografía recomendada</h4>
+        <ul>
+          <li>Display / Headlines: <strong>DM Sans</strong> o similar</li>
+          <li>Datos / Mono: <strong>DM Mono</strong></li>
+          <li>Alternativa: Inter, Poppins, Plus Jakarta Sans</li>
+          <li>Evitar: tipografías decorativas o poco legibles en mobile</li>
+        </ul>
+      </div>
+      <div class="card white">
+        <h4>Tono visual general</h4>
+        <ul>
+          <li>Fintech moderno — no bancario tradicional</li>
+          <li>Oscuro con acentos verdes para TikTok/Meta</li>
+          <li>Limpio y blanco para Google assets</li>
+          <li>UY: estilo más premium y aspiracional</li>
+          <li>ARG: más cripto, más oscuro, más urgente</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note note-red" style="margin-top:14px"><strong>Reglas de compliance visual:</strong> ninguna pieza puede incluir imágenes de contenido adulto o sugestivo. Las piezas son para plataformas de publicidad regulada — el visual debe ser apto para revisión automática de Meta, Google y TikTok. El nicho se reconoce por el copy, no por la imagen.</div>
+  </div>
+
+  <!-- ENTREGABLES -->
+  <div class="section">
+    <div class="section-title">Resumen de entregables para cotización</div>
+    <table class="table">
+      <thead>
+        <tr><th>#</th><th>Tipo de pieza</th><th>Cantidad</th><th>Plataforma</th><th>Formato</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Set de assets Google (3 tamaños + logo)</td><td>14 sets = <strong>42 archivos</strong></td><td>Google Ads</td><td>JPG/PNG</td></tr>
+        <tr><td>2</td><td>Imagen estática Feed</td><td>9 piezas × 2 tamaños = <strong>18 archivos</strong></td><td>Meta</td><td>JPG/PNG</td></tr>
+        <tr><td>3</td><td>Carrusel (4 slides)</td><td>1 carrusel = <strong>4 archivos</strong></td><td>Meta (CO)</td><td>JPG/PNG 1080×1080</td></tr>
+        <tr><td>4</td><td>Video TikTok / Reels</td><td>8 videos</td><td>TikTok / Meta Reels</td><td>MP4 9:16</td></tr>
+        <tr><td>5</td><td>Overlay / template Spark Ad</td><td>1 template</td><td>TikTok Spark (CO)</td><td>AE / PR / MP4</td></tr>
+        <tr class="total"><td colspan="2"><strong>TOTAL ARCHIVOS A ENTREGAR</strong></td><td><strong>~73 archivos</strong></td><td colspan="2">Google + Meta + TikTok</td></tr>
+      </tbody>
+    </table>
+    <div class="note note-green" style="margin-top:14px"><strong>Sugerencia:</strong> Kevin puede cotizar por paquete país o por tipo de pieza. Se recomienda priorizar CO, MX y AR en la primera entrega, y CL, EC, PA, UY en una segunda fase, alineado con el orden de lanzamiento del brief.</div>
+  </div>
+
+  <div class="footer">
+    G7Cripto · Brief de Diseño para Kevin Barragán · Abril 2026 · Documento interno · Confidencial
+  </div>
+
+</div>
+</body>
+</html>
